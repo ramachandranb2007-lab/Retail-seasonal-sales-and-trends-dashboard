@@ -1,0 +1,76 @@
+// ============================================================================
+// DAX Calculated Table: DimDate
+// Description: Spans dataset history (2023-01-01 to 2025-12-31).
+//              Provides standard calendar attributes, seasonal mapping, 
+//              and retail promotional festival flags.
+// ============================================================================
+
+DimDate = 
+VAR BaseCalendar = 
+    CALENDAR(DATE(2023, 1, 1), DATE(2025, 12, 31))
+RETURN
+    ADDCOLUMNS(
+        BaseCalendar,
+        "DateKey", INT(FORMAT([Date], "YYYYMMDD")),
+        "Year", YEAR([Date]),
+        "Quarter", "Q" & FORMAT([Date], "Q"),
+        "Month", FORMAT([Date], "MMMM"),
+        "MonthNo", MONTH([Date]),
+        "Week", WEEKNUM([Date], 2),
+        "DayOfWeek", FORMAT([Date], "DDDD"),
+        "IsWeekend", IF(WEEKDAY([Date], 2) >= 6, 1, 0),
+        
+        // Seasonal segmentation
+        "Season", 
+            SWITCH(
+                TRUE(),
+                MONTH([Date]) IN {3, 4, 5}, "Spring",
+                MONTH([Date]) IN {6, 7, 8}, "Summer",
+                MONTH([Date]) IN {9, 10, 11}, "Fall",
+                "Winter"
+            ),
+        
+        "SeasonKey",
+            SWITCH(
+                TRUE(),
+                MONTH([Date]) IN {3, 4, 5}, 1,
+                MONTH([Date]) IN {6, 7, 8}, 2,
+                MONTH([Date]) IN {9, 10, 11}, 3,
+                4
+            ),
+
+        // Retail Festival & Promotion Calendar
+        "Festival",
+            VAR M = MONTH([Date])
+            VAR D = DAY([Date])
+            VAR WD = WEEKDAY([Date], 2) // 1=Mon, 4=Thu, 5=Fri
+            RETURN
+                SWITCH(
+                    TRUE(),
+                    M = 1 && D = 1, "New Year's Day",
+                    M = 2 && D = 14, "Valentine's Day",
+                    M = 5 && D >= 25 && WD = 1, "Memorial Day Sale",
+                    M = 7 && D = 4, "Independence Day Sale",
+                    M = 9 && D <= 7 && WD = 1, "Labor Day / Back to School",
+                    M = 10 && D = 31, "Halloween",
+                    M = 11 && D >= 22 && D <= 28 && WD = 4, "Thanksgiving",
+                    M = 11 && D >= 23 && D <= 29 && WD = 5, "Black Friday",
+                    M = 11 && D >= 26 && D <= 30 && WD = 1, "Cyber Monday",
+                    M = 12 && (D = 1 || D = 2), "Cyber Week",
+                    M = 12 && (D = 24 || D = 25), "Christmas Holiday",
+                    M = 12 && D >= 26 && D <= 31, "Year-End Mega Clearance",
+                    "Regular Trading"
+                )
+    )
+
+/*
+IMPORTANT POWER BI CONFIGURATION STEPS FOR DimDate:
+1. Mark as Date Table:
+   - In Power BI Desktop: Table Tools > Mark as Date Table > Select 'Date' column.
+2. Set 'Sort By Column':
+   - Set 'Month' Sort by Column -> 'MonthNo'
+   - Set 'DayOfWeek' Sort by Column -> 'IsWeekend' or DayOfWeekNo
+   - Set 'Season' Sort by Column -> 'SeasonKey'
+3. Create Hierarchy:
+   - Calendar Hierarchy: Year > Quarter > Month > Date
+*/

@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Retail Seasonal Sales Trend Dashboard | Microsoft Power BI Star Schema & DAX</title>
+  <meta name="description" content="Production-ready Retail Seasonal Sales Trend Power BI Dashboard with Star Schema architecture, dynamic DAX time intelligence, seasonal indexing, and 6-page interactive report.">
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Top Power BI Header Bar -->
+  <header class="pbi-header">
+    <div class="brand-section">
+      <div class="pbi-badge">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M4 19h4V9H4v10zm6 0h4V5h-4v14zm6 0h4v-8h-4v8z"/>
+        </svg>
+        POWER BI
+      </div>
+      <div class="dashboard-title">
+        Retail Seasonal Sales Trend Dashboard
+        <span class="subtitle">Star Schema & DAX Intelligence Engine</span>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <button id="btn-theme-toggle" class="btn-header" title="Toggle Light/Dark Theme">
+        <span id="theme-icon">🌙</span> <span id="theme-label">Dark Theme</span>
+      </button>
+      <button id="btn-reconciliation" class="btn-header" title="Open Data Audit & Reconciliation Report">
+        <span>📋</span> Audit Reconciliation
+      </button>
+      <button id="btn-reset-filters" class="btn-header" title="Reset all active slicers to default">
+        <span>🔄</span> Reset Slicers
+      </button>
+      <button id="btn-export-all" class="btn-header primary" title="Export current filtered view to CSV">
+        <span>📥</span> Export CSV
+      </button>
+    </div>
+  </header>
+
+  <!-- Global Slicers & Filters Ribbon -->
+  <section class="slicer-ribbon" aria-label="Dashboard Slicers">
+    <div class="slicer-group">
+      <span class="slicer-label">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+        </svg>
+        Slicers:
+      </span>
+
+      <!-- Year Slicer -->
+      <div class="slicer-item">
+        <label for="slicer-year" class="sr-only">Year</label>
+        <select id="slicer-year" class="slicer-select">
+          <option value="ALL">Year: All (2023-2025)</option>
+          <option value="2025">Year: 2025</option>
+          <option value="2024">Year: 2024</option>
+          <option value="2023">Year: 2023</option>
+        </select>
+      </div>
+
+      <!-- Season Slicer -->
+      <div class="slicer-item">
+        <label for="slicer-season" class="sr-only">Season</label>
+        <select id="slicer-season" class="slicer-select">
+          <option value="ALL">Season: All Seasons</option>
+          <option value="Spring">🌱 Spring (Mar-May)</option>
+          <option value="Summer">☀️ Summer (Jun-Aug)</option>
+          <option value="Fall">🍂 Fall (Sep-Nov)</option>
+          <option value="Winter">❄️ Winter (Dec-Feb)</option>
+        </select>
+      </div>
+
+      <!-- Category Slicer -->
+      <div class="slicer-item">
+        <label for="slicer-category" class="sr-only">Category</label>
+        <select id="slicer-category" class="slicer-select">
+          <option value="ALL">Category: All Categories</option>
+          <option value="Apparel">Apparel</option>
+          <option value="Electronics">Electronics</option>
+          <option value="Home & Garden">Home & Garden</option>
+          <option value="Sports & Outdoor">Sports & Outdoor</option>
+          <option value="Beauty & Health">Beauty & Health</option>
+        </select>
+      </div>
+
+      <!-- Region Slicer -->
+      <div class="slicer-item">
+        <label for="slicer-region" class="sr-only">Region</label>
+        <select id="slicer-region" class="slicer-select">
+          <option value="ALL">Region: All Regions</option>
+          <option value="East">East</option>
+          <option value="Central">Central</option>
+          <option value="South">South</option>
+          <option value="West">West</option>
+        </select>
+      </div>
+
+      <!-- Store Slicer -->
+      <div class="slicer-item">
+        <label for="slicer-store" class="sr-only">Store</label>
+        <select id="slicer-store" class="slicer-select">
+          <option value="ALL">Store: All Stores</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Active Slicer Badges -->
+    <div id="active-pills-container" class="active-filter-pills">
+      <span class="filter-pill">Scope: All Data</span>
+    </div>
+  </section>
+
+  <!-- Main Shell -->
+  <div class="app-container">
+    
+    <!-- Left Navigation Pane (Power BI Pages) -->
+    <nav class="page-nav-pane" aria-label="Report Pages">
+      <div class="nav-section-title">Report Pages</div>
+
+      <button class="nav-tab-btn active" data-page="page-1" id="nav-btn-page-1">
+        <span class="tab-icon">📊</span>
+        <span>Executive Overview</span>
+        <span class="page-num">P1</span>
+      </button>
+
+      <button class="nav-tab-btn" data-page="page-2" id="nav-btn-page-2">
+        <span class="tab-icon">📈</span>
+        <span>Seasonal Trend</span>
+        <span class="page-num">P2</span>
+      </button>
+
+      <button class="nav-tab-btn" data-page="page-3" id="nav-btn-page-3">
+        <span class="tab-icon">🏷️</span>
+        <span>Category & Product</span>
+        <span class="page-num">P3</span>
+      </button>
+
+      <button class="nav-tab-btn" data-page="page-4" id="nav-btn-page-4">
+        <span class="tab-icon">🗺️</span>
+        <span>Store & Region</span>
+        <span class="page-num">P4</span>
+      </button>
+
+      <button class="nav-tab-btn" data-page="page-5" id="nav-btn-page-5">
+        <span class="tab-icon">🛍️</span>
+        <span>Festival Impact</span>
+        <span class="page-num">P5</span>
+      </button>
+
+      <button class="nav-tab-btn" data-page="page-6" id="nav-btn-page-6">
+        <span class="tab-icon">🔍</span>
+        <span>Drill-through Detail</span>
+        <span class="page-num">P6</span>
+      </button>
+
+      <!-- Seasonal Palette Legend -->
+      <div class="season-legend-box">
+        <div class="season-legend-title">Seasonal Theme Palette</div>
+        <div class="season-tag-row">
+          <div class="season-tag"><span class="season-dot spring"></span> Spring</div>
+          <div class="season-tag"><span class="season-dot summer"></span> Summer</div>
+          <div class="season-tag"><span class="season-dot fall"></span> Fall</div>
+          <div class="season-tag"><span class="season-dot winter"></span> Winter</div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Report Viewport (16:9 Canvas) -->
+    <main class="report-viewport">
+      <div class="report-canvas-16-9">
+
+        <!-- ================================================================
+             PAGE 1: EXECUTIVE OVERVIEW
+             KPI cards, monthly sales line chart, season donut, region map
+             ================================================================ -->
+        <section id="page-1" class="page-view active" aria-labelledby="heading-page-1">
+          <div class="page-header-row">
+            <div>
+              <h1 id="heading-page-1" class="page-heading">Executive Overview</h1>
+              <div class="page-subheading" id="p1-dynamic-subtitle">High-level financial KPIs, seasonal distribution, and geographical performance</div>
+            </div>
+            <div class="quick-action-btns">
+              <button class="btn-header" onclick="window.navigateToPage('page-2')">View Trend Deep-Dive →</button>
+            </div>
+          </div>
+
+          <!-- 4 Primary KPI Cards -->
+          <div class="kpi-cards-grid">
+            <div class="kpi-card" id="kpi-card-sales">
+              <div class="kpi-header">
+                <span class="kpi-title">Total Sales</span>
+                <span class="kpi-icon">💰</span>
+              </div>
+              <div class="kpi-value" id="kpi-val-sales">$0.00</div>
+              <div class="kpi-footer">
+                <span class="kpi-badge-trend positive" id="kpi-trend-sales">▲ +0.0% YoY</span>
+                <span class="kpi-subtext" id="kpi-sub-sales">LY: $0.00</span>
+              </div>
+            </div>
+
+            <div class="kpi-card" id="kpi-card-profit">
+              <div class="kpi-header">
+                <span class="kpi-title">Total Profit</span>
+                <span class="kpi-icon">📈</span>
+              </div>
+              <div class="kpi-value" id="kpi-val-profit">$0.00</div>
+              <div class="kpi-footer">
+                <span class="kpi-badge-trend positive" id="kpi-trend-profit">▲ Margin: 0.0%</span>
+                <span class="kpi-subtext" id="kpi-sub-profit">Target: 30%</span>
+              </div>
+            </div>
+
+            <div class="kpi-card" id="kpi-card-margin">
+              <div class="kpi-header">
+                <span class="kpi-title">Profit Margin %</span>
+                <span class="kpi-icon">🎯</span>
+              </div>
+              <div class="kpi-value" id="kpi-val-margin">0.0%</div>
+              <div class="kpi-footer">
+                <span class="kpi-subtext">DIVIDE([Total Profit], [Total Sales])</span>
+                <span class="kpi-badge-trend positive" id="kpi-badge-margin-status">Healthy</span>
+              </div>
+            </div>
+
+            <div class="kpi-card" id="kpi-card-units">
+              <div class="kpi-header">
+                <span class="kpi-title">Units Sold & AOV</span>
+                <span class="kpi-icon">📦</span>
+              </div>
+              <div class="kpi-value" id="kpi-val-units">0</div>
+              <div class="kpi-footer">
+                <span class="kpi-subtext" id="kpi-sub-aov">AOV: $0.00 / order</span>
+                <span class="kpi-badge-trend positive" id="kpi-sub-orders">0 Orders</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Visuals Row: Monthly Sales Line & Season Donut -->
+          <div class="visuals-row-2">
+            <!-- Visual 1: Monthly Sales Line Chart -->
+            <div class="visual-card">
+              <div class="visual-header">
+                <div>
+                  <div class="visual-title">Monthly Sales Trend & Moving Average</div>
+                  <div class="visual-subtitle">Revenue over time with 3-Month Moving Average trajectory</div>
+                </div>
+                <div class="visual-controls">
+                  <button class="btn-visual-tool active" id="btn-toggle-ma" title="Toggle 3-Month Moving Average">3M MA</button>
+                  <button class="btn-visual-tool" id="btn-drilldown-date" title="Drill into Quarter/Month">Hierarchy</button>
+                </div>
+              </div>
+              <div class="chart-box tall" id="chart-box-monthly-sales">
+                <!-- SVG rendered via JavaScript -->
+              </div>
+            </div>
+
+            <!-- Visual 2: Season Share Donut Chart -->
+            <div class="visual-card">
+              <div class="visual-header">
+                <div>
+                  <div class="visual-title">Season Share %</div>
+                  <div class="visual-subtitle">Revenue contribution by retail season [DAX: Season Share %]</div>
+                </div>
+                <div class="visual-controls">
+                  <span class="visual-subtitle">Interactive Cross-Filter</span>
+                </div>
+              </div>
+              <div class="chart-box tall" id="chart-box-season-donut">
+                <!-- Donut Chart & Legend rendered via JavaScript -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Visual 3: Region Geographic Performance Overview -->
+          <div class="visual-card">
+            <div class="visual-header">
+              <div>
+                <div class="visual-title">Geographic Regional Revenue & Profit Margin</div>
+                <div class="visual-subtitle">Sales volume and profitability breakdown across East, Central, South, and West territories</div>
+              </div>
+              <button class="btn-visual-tool" onclick="window.navigateToPage('page-4')">Open Region Deep-Dive →</button>
+            </div>
+            <div class="chart-box compact" id="chart-box-p1-region-bars">
+              <!-- Regional horizontal bars rendered via JavaScript -->
+            </div>
+          </div>
+        </section>
+
+
+        <!-- ================================================================
+             PAGE 2: SEASONAL TREND ANALYSIS
+             Line chart with prior-year overlay, seasonal index column, heatmap
+             ================================================================ -->
+        <section id="page-2" class="page-view" aria-labelledby="heading-page-2">
+          <div class="page-header-row">
+            <div>
+              <h1 id="heading-page-2" class="page-heading">Seasonal Trend Analysis</h1>
+              <div class="page-subheading">Prior-year benchmarking, monthly seasonality index, and multi-year cross-tab heatmap</div>
+            </div>
+          </div>
+
+          <!-- Visuals Row: Sales vs. Prior Year Overlay & Seasonal Index -->
+          <div class="visuals-row-equal">
+            <!-- Visual 1: Line Chart with Prior-Year (LY) Overlay -->
+            <div class="visual-card">
+              <div class="visual-header">
+                <div>
+                  <div class="visual-title">Monthly Sales with Prior-Year (LY) Overlay</div>
+                  <div class="visual-subtitle">Total Sales vs. [Sales Last Year (LY)] via SAMEPERIODLASTYEAR</div>
+                </div>
+                <div class="visual-controls">
+                  <span class="visual-subtitle" id="p2-yoy-delta-label">YoY Delta</span>
+                </div>
+              </div>
+              <div class="chart-box tall" id="chart-box-p2-ly-overlay">
+                <!-- Line Chart with Overlay rendered via JS -->
+              </div>
+            </div>
+
+            <!-- Visual 2: Seasonal Index Column Chart -->
+            <div class="visual-card">
+              <div class="visual-header">
+                <div>
+                  <div class="visual-title">Seasonal Index by Month</div>
+                  <div class="visual-subtitle">DIVIDE([Total Sales], AVERAGEX(ALL(DimDate[Month]), [Total Sales])) — Baseline = 1.00</div>
+                </div>
+              </div>
+              <div class="chart-box tall" id="chart-box-p2-seasonal-index">
+                <!-- Column Chart rendered via JS -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Visual 3: Month-by-Year Heatmap Matrix -->
+          <div class="visual-card">
+            <div class="visual-header">
+              <div>
+                <div class="visual-title">Month-by-Year Seasonal Heatmap Matrix</div>
+                <div class="visual-subtitle">Multi-year revenue distribution matrix highlighting seasonal surges and quiet troughs</div>
+              </div>
+            </div>
+            <div class="matrix-container" id="matrix-container-heatmap">
+              <!-- Heatmap table rendered via JS -->
+            </div>
+          </div>
+        </section>
+
+
+        <!-- ================================================================
+             PAGE 3: CATEGORY AND PRODUCT
+             Stacked bar by category and season, top/bottom 10, category treemap
+             ================================================================ -->
+        <section id="page-3" class="page-view" aria-labelledby="heading-page-3">
+          <div class="page-header-row">
+            <div>
+              <h1 id="heading-page-3" class="page-heading">Category & Product Intelligence</h1>
+              <div class="page-subheading">Product portfolio mix, seasonal affinity, and SKU profitability ranking</div>
+            </div>
+          </div>
+
+          <!-- Visuals Row: Stacked Bar Chart & Category Treemap -->
+          <div class="visuals-row-equal">
+            <!-- Visual 1: Stacked Bar Chart by Category & Season -->
+            <div class="visual-card">
+              <div class="visual-header">
+                <div>
+                  <div class="visual-title">Sales by Category Stacked by Season</div>
+                  <div class="visual-subtitle">Category sales composition split across Spring, Summer, Fall, and Winter</div>
+                </div>
+              </div>
+              <div class="chart-box tall" id="chart-box-p3-category-season-bar">
+                <!-- Stacked bar chart rendered via JS -->
+              </div>
+            </div>
+
+            <!-- Visual 2: Category Treemap -->
+            <div class="visual-card">
+              <div class="visual-header">
+                <div>
+                  <div class="visual-title">Category Revenue Treemap</div>
+                  <div class="visual-subtitle">Proportional sales volume and subcategory hierarchy</div>
+                </div>
+              </div>
+              <div class="chart-box tall" id="chart-box-p3-treemap">
+                <!-- Treemap grid rendered via JS -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Visual 3: Top / Bottom 10 Products -->
+          <div class="visual-card">
+            <div class="visual-header">
+              <div>
+                <div class="visual-title" id="p3-topbottom-title">Top 10 Products by Revenue</div>
+                <div class="visual-subtitle">Ranked product contribution, unit price, and margin performance</div>
+              </div>
+              <div class="visual-controls">
+                <button class="btn-visual-tool active" id="btn-show-top10">Top 10 SKUs</button>
+                <button class="btn-visual-tool" id="btn-show-bottom10">Bottom 10 SKUs</button>
+              </div>
+            </div>
+            <div class="chart-box tall" id="chart-box-p3-products-ranking">
+              <!-- Ranked Horizontal Bar Chart rendered via JS -->
+            </div>
+          </div>
+        </section>
+
+
+        <!-- ================================================================
+             PAGE 4: STORE AND REGION
+             Filled map / regional bubble map, store ranking bar, region matrix
+             ================================================================ -->
+        <section id="page-4" class="page-view" aria-labelledby="heading-page-4">
+          <div class="page-header-row">
+            <div>
+              <h1 id="heading-page-4" class="page-heading">Store & Regional Geographic Performance</h1>
+              <div class="page-subheading">Store network benchmarking, regional distribution, and seasonal regional dynamics</div>
+            </div>
+          </div>
+
+          <div class="visuals-row-hero">
+            <!-- Visual 1: Interactive Geographic Map -->
+            <div class="visual-card">
+              <div class="visual-header">
+                <div>
+                  <div class="visual-title">Store Network Geographic Distribution</div>
+                  <div class="visual-subtitle">Click any region or store bubble to cross-filter the report</div>
+                </div>
+              </div>
+              <div class="chart-box tall" id="chart-box-p4-geo-map">
+                <!-- SVG US Map rendered via JS -->
+              </div>
+            </div>
+
+            <!-- Visual 2: Region-by-Season Matrix -->
+            <div class="visual-card">
+              <div class="visual-header">
+                <div>
+                  <div class="visual-title">Region by Season Cross-Matrix</div>
+                  <div class="visual-subtitle">Sales & Margin % across geographic zones</div>
+                </div>
+              </div>
+              <div class="matrix-container" id="matrix-container-region-season">
+                <!-- Matrix rendered via JS -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Visual 3: Store Ranking Bar Chart -->
+          <div class="visual-card">
+            <div class="visual-header">
+              <div>
+                <div class="visual-title">Store Performance Ranking (All 14 Locations)</div>
+                <div class="visual-subtitle">Ranked by Total Sales with store format tags (Flagship, Mall, Outlet)</div>
+              </div>
+            </div>
+            <div class="chart-box tall" id="chart-box-p4-stores-ranking">
+              <!-- Store ranking bars rendered via JS -->
+            </div>
+          </div>
+        </section>
+
+
+        <!-- ================================================================
+             PAGE 5: FESTIVAL / PROMOTION IMPACT
+             Sales vs. discount scatter plot, festival-period comparison view
+             ================================================================ -->
+        <section id="page-5" class="page-view" aria-labelledby="heading-page-5">
+          <div class="page-header-row">
+            <div>
+              <h1 id="heading-page-5" class="page-heading">Festival & Promotional Impact Analysis</h1>
+              <div class="page-subheading">Discount elasticity, event sales uplift, and holiday promotional yield</div>
+            </div>
+          </div>
+
+          <div class="visuals-row-equal">
+            <!-- Visual 1: Sales vs. Discount Scatter Plot -->
+            <div class="visual-card">
+              <div class="visual-header">
+                <div>
+                  <div class="visual-title">Sales vs. Discount Rate Scatter Plot</div>
+                  <div class="visual-subtitle">Transaction Revenue vs. Discount % (Color = Season, Size = Quantity)</div>
+                </div>
+              </div>
+              <div class="chart-box tall" id="chart-box-p5-scatter">
+                <!-- Scatter Plot rendered via JS -->
+              </div>
+            </div>
+
+            <!-- Visual 2: Festival-Period Comparison View -->
+            <div class="visual-card">
+              <div class="visual-header">
+                <div>
+                  <div class="visual-title">Festival Period Comparison vs. Regular Trading</div>
+                  <div class="visual-subtitle">Daily sales run-rate comparison across key promotional windows</div>
+                </div>
+              </div>
+              <div class="chart-box tall" id="chart-box-p5-festivals-bar">
+                <!-- Festival Comparison Bars rendered via JS -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Festival Metrics Table -->
+          <div class="visual-card">
+            <div class="visual-header">
+              <div>
+                <div class="visual-title">Retail Festival & Holiday Performance Summary</div>
+                <div class="visual-subtitle">Detailed breakdown of transaction volume, average discount, revenue, and gross profit per festival</div>
+              </div>
+            </div>
+            <div class="matrix-container" id="matrix-container-festivals">
+              <!-- Festival table rendered via JS -->
+            </div>
+          </div>
+        </section>
+
+
+        <!-- ================================================================
+             PAGE 6: DRILL-THROUGH TRANSACTION DETAIL
+             Detailed transaction table enabled via drill-through from summary
+             ================================================================ -->
+        <section id="page-6" class="page-view" aria-labelledby="heading-page-6">
+          <div class="page-header-row">
+            <div>
+              <h1 id="heading-page-6" class="page-heading">Drill-through Transaction Detail</h1>
+              <div class="page-subheading">Granular order-level line items filtered by your interactive selections</div>
+            </div>
+            <button class="btn-header" id="btn-back-from-drillthrough">← Return to Overview</button>
+          </div>
+
+          <!-- Drill-through Context Banner -->
+          <div class="drillthrough-banner">
+            <div class="drillthrough-summary">
+              <div class="drillthrough-stat">
+                <span class="stat-label">Filtered Orders</span>
+                <span class="stat-val" id="dt-stat-orders">0</span>
+              </div>
+              <div class="drillthrough-stat">
+                <span class="stat-label">Filtered Revenue</span>
+                <span class="stat-val" id="dt-stat-revenue">$0.00</span>
+              </div>
+              <div class="drillthrough-stat">
+                <span class="stat-label">Filtered Profit</span>
+                <span class="stat-val" id="dt-stat-profit">$0.00</span>
+              </div>
+              <div class="drillthrough-stat">
+                <span class="stat-label">Average Margin %</span>
+                <span class="stat-val" id="dt-stat-margin">0.0%</span>
+              </div>
+            </div>
+            <button class="btn-header" id="btn-clear-drillthrough-filter">Clear Specific Filter</button>
+          </div>
+
+          <!-- Table Toolbar -->
+          <div class="table-toolbar">
+            <input type="text" id="dt-search-input" class="table-search-input" placeholder="Search by Order ID, Product, City, or Category...">
+            <div class="table-actions">
+              <button class="btn-header primary" id="btn-export-table-csv">Download Current Table (CSV)</button>
+            </div>
+          </div>
+
+          <!-- Detailed Transaction Table -->
+          <div class="data-table-wrapper">
+            <table class="pbi-data-table" id="transaction-detail-table">
+              <thead>
+                <tr>
+                  <th data-sort="OrderID">Order ID ↕</th>
+                  <th data-sort="Date">Date ↕</th>
+                  <th data-sort="ProductName">Product Name ↕</th>
+                  <th data-sort="Category">Category ↕</th>
+                  <th data-sort="StoreName">Store & Region ↕</th>
+                  <th data-sort="Season">Season ↕</th>
+                  <th data-sort="Quantity" style="text-align: right;">Qty ↕</th>
+                  <th data-sort="Discount" style="text-align: right;">Discount ↕</th>
+                  <th data-sort="Revenue" style="text-align: right;">Revenue ↕</th>
+                  <th data-sort="Profit" style="text-align: right;">Profit ↕</th>
+                  <th data-sort="Margin" style="text-align: right;">Margin % ↕</th>
+                </tr>
+              </thead>
+              <tbody id="dt-table-body">
+                <!-- Rows injected via JS -->
+              </tbody>
+            </table>
+
+            <div class="table-footer">
+              <div id="table-page-info">Showing 1 to 25 of 17,000 entries</div>
+              <div class="pagination-controls">
+                <button class="btn-page" id="btn-prev-page" disabled>Previous</button>
+                <span id="current-page-num" style="font-weight: 700; padding: 0 8px;">1</span>
+                <button class="btn-page" id="btn-next-page">Next</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Interactive Rich Tooltip Element -->
+  <div id="pbi-tooltip" class="pbi-tooltip"></div>
+
+  <!-- Modal: Data Reconciliation & Star Schema Audit -->
+  <div id="reconciliation-modal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Data Architecture & Financial Reconciliation Audit</h2>
+        <button class="btn-close-modal" id="btn-close-audit">✕</button>
+      </div>
+
+      <div style="font-size: 13px; color: var(--text-secondary); line-height: 1.5;">
+        This audit verifies mathematical reconciliation between source tables (<code>FactSales.csv</code>, <code>DimProduct.csv</code>, <code>DimStore.csv</code>, <code>DimSeason.csv</code>, <code>DimDate.csv</code>) and the DAX Measures calculated in the model.
+      </div>
+
+      <table class="audit-table">
+        <thead>
+          <tr>
+            <th>Measure / Metric</th>
+            <th>Source Data File</th>
+            <th>Power BI DAX Value</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="audit-table-body">
+          <!-- Populated by JS -->
+        </tbody>
+      </table>
+
+      <div style="margin-top: 10px; background: var(--bg-canvas); padding: 12px; border-radius: var(--radius-md); font-size: 12px;">
+        <strong>Star Schema Validation:</strong>
+        <ul style="margin-left: 20px; margin-top: 6px; color: var(--text-secondary);">
+          <li>Fact Table: <code>FactSales</code> (Cleaned status: Cancelled orders flagged/filtered)</li>
+          <li>1-to-Many Relationships: <code>DimDate[DateKey]</code> → <code>FactSales[DateKey]</code> (Single Direction)</li>
+          <li>1-to-Many Relationships: <code>DimProduct[ProductKey]</code> → <code>FactSales[ProductKey]</code> (Single Direction)</li>
+          <li>1-to-Many Relationships: <code>DimStore[StoreKey]</code> → <code>FactSales[StoreKey]</code> (Single Direction)</li>
+          <li>1-to-Many Relationships: <code>DimSeason[SeasonKey]</code> → <code>FactSales[SeasonKey]</code> (Single Direction)</li>
+          <li>Date Table: <code>DimDate</code> marked as official Date table (Date column)</li>
+        </ul>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end;">
+        <button class="btn-header primary" id="btn-close-audit-bottom">Close Audit</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Load Data and Application Scripts -->
+  <script src="data/retail_dashboard_data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

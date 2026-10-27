@@ -1,0 +1,29 @@
+ProductKey,ProductID,ProductName,Category,SubCategory,UnitCost,UnitPrice
+1,PRD-APP-001,Thermal Winter Parka,Apparel,Outerwear,65.0,149.99
+2,PRD-APP-002,Cashmere Knit Sweater,Apparel,Knitwear,42.0,99.5
+3,PRD-APP-003,Breathable Linen Shirt,Apparel,Tops,18.0,48.0
+4,PRD-APP-004,Floral Spring Sundress,Apparel,Dresses,25.0,69.9
+5,PRD-APP-005,Waterproof Trench Coat,Apparel,Outerwear,55.0,129.0
+6,PRD-APP-006,Classic Denim Jacket,Apparel,Outerwear,35.0,79.99
+7,PRD-APP-007,Quick-Dry Board Shorts,Apparel,Swimwear,12.0,34.5
+8,PRD-ELE-001,UltraHD 4K Smart OLED TV,Electronics,Home Entertainment,480.0,899.99
+9,PRD-ELE-002,Noise-Cancelling Wireless Headphones,Electronics,Audio,85.0,199.99
+10,PRD-ELE-003,Smart Fitness Watch Pro,Electronics,Wearables,70.0,159.0
+11,PRD-ELE-004,Portable Bluetooth Speaker,Electronics,Audio,28.0,69.99
+12,PRD-ELE-005,Ergonomic Mechanical Keyboard,Electronics,Computer Accessories,45.0,109.99
+13,PRD-ELE-006,1080p Streaming Webcam,Electronics,Computer Accessories,22.0,59.5
+14,PRD-HOM-001,Ceramic Space Heater 1500W,Home & Garden,Climate Control,28.0,69.99
+15,PRD-HOM-002,Duo Oscillating Tower Fan,Home & Garden,Climate Control,24.0,59.99
+16,PRD-HOM-003,Botanical Planter Set 3-Pack,Home & Garden,Gardening,15.0,39.99
+17,PRD-HOM-004,Heavy-Duty Cordless Lawnmower,Home & Garden,Lawn Care,140.0,299.0
+18,PRD-HOM-005,Decorative Holiday String Lights,Home & Garden,Seasonal Decor,8.0,29.99
+19,PRD-HOM-006,Autumn Scented Candle Collection,Home & Garden,Home Fragrance,10.0,26.5
+20,PRD-SPO-001,4-Person Camping Tent,Sports & Outdoor,Camping,75.0,169.99
+21,PRD-SPO-002,All-Mountain Snow Ski Goggles,Sports & Outdoor,Winter Sports,30.0,79.99
+22,PRD-SPO-003,Aluminum Road Bicycle 21-Speed,Sports & Outdoor,Cycling,190.0,420.0
+23,PRD-SPO-004,Insulated Hydro Canteen 32oz,Sports & Outdoor,Hydration,11.0,29.99
+24,PRD-SPO-005,Trekking Poles Carbon Fiber,Sports & Outdoor,Hiking,22.0,54.99
+25,PRD-BEA-001,Hydrating SPF 50 Sunscreen,Beauty & Health,Sun Care,7.0,22.0
+26,PRD-BEA-002,Intense Moisture Winter Lip Balm,Beauty & Health,Skincare,3.0,9.99
+27,PRD-BEA-003,Vitamin C Radiance Glow Serum,Beauty & Health,Skincare,12.0,38.0
+28,PRD-BEA-004,Exfoliating Coffee Body Scrub,Beauty & Health,Personal Care,8.0,24.5

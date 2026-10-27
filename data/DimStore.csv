@@ -1,0 +1,15 @@
+StoreKey,StoreName,City,State,Region,StoreType
+1,Metro Center Flagship,New York,NY,East,Flagship
+2,Boston Common Galleria,Boston,MA,East,Mall
+3,Philadelphia Liberty Center,Philadelphia,PA,East,Outlet
+4,Magnificent Mile Retail,Chicago,IL,Central,Flagship
+5,Twin Cities Mall of America,Minneapolis,MN,Central,Mall
+6,Detroit Metro Pavilion,Detroit,MI,Central,Outlet
+7,Atlanta Peachtree Square,Atlanta,GA,South,Mall
+8,Miami Biscayne Promenade,Miami,FL,South,Flagship
+9,Dallas Galleria Station,Dallas,TX,South,Mall
+10,Houston Space City Plaza,Houston,TX,South,Outlet
+11,San Francisco Union Square,San Francisco,CA,West,Flagship
+12,Los Angeles Beverly Centre,Los Angeles,CA,West,Mall
+13,Seattle Pike Place Market,Seattle,WA,West,Flagship
+14,Denver Rocky Mountain Mall,Denver,CO,West,Outlet

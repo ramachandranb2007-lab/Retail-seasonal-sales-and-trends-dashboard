@@ -1,0 +1,144 @@
+{
+  "name": "Retail_Seasonal_Sales_Trend_Model",
+  "compatibilityLevel": 1550,
+  "description": "Star Schema Tabular Model for Retail Seasonal Sales Trend Analysis across Multi-Year Operations",
+  "tables": [
+    {
+      "name": "FactSales",
+      "description": "Central transactional fact table storing orders, units, revenue, discounts, and margins",
+      "columns": [
+        {"name": "OrderID", "dataType": "string", "isKey": true},
+        {"name": "DateKey", "dataType": "int64", "isHidden": true},
+        {"name": "ProductKey", "dataType": "int64", "isHidden": true},
+        {"name": "StoreKey", "dataType": "int64", "isHidden": true},
+        {"name": "SeasonKey", "dataType": "int64", "isHidden": true},
+        {"name": "Quantity", "dataType": "int64"},
+        {"name": "Revenue", "dataType": "double", "formatString": "$#,##0.00"},
+        {"name": "Discount", "dataType": "double", "formatString": "0.0%"},
+        {"name": "Profit", "dataType": "double", "formatString": "$#,##0.00"},
+        {"name": "OrderStatus", "dataType": "string"}
+      ]
+    },
+    {
+      "name": "DimDate",
+      "description": "Dedicated official Date table with calendar intelligence and seasonal flags",
+      "isDateTable": true,
+      "dateColumn": "Date",
+      "columns": [
+        {"name": "DateKey", "dataType": "int64", "isKey": true},
+        {"name": "Date", "dataType": "dateTime", "formatString": "yyyy-mm-dd"},
+        {"name": "Year", "dataType": "int64"},
+        {"name": "Quarter", "dataType": "string"},
+        {"name": "Month", "dataType": "string", "sortByColumn": "MonthNo"},
+        {"name": "MonthNo", "dataType": "int64", "isHidden": true},
+        {"name": "Week", "dataType": "int64"},
+        {"name": "DayOfWeek", "dataType": "string"},
+        {"name": "IsWeekend", "dataType": "int64"},
+        {"name": "Season", "dataType": "string", "sortByColumn": "SeasonKey"},
+        {"name": "SeasonKey", "dataType": "int64", "isHidden": true},
+        {"name": "Festival", "dataType": "string"}
+      ],
+      "hierarchies": [
+        {
+          "name": "Date Hierarchy",
+          "levels": ["Year", "Quarter", "Month", "Date"]
+        }
+      ]
+    },
+    {
+      "name": "DimProduct",
+      "description": "Product catalog dimension with category groupings and price tiers",
+      "columns": [
+        {"name": "ProductKey", "dataType": "int64", "isKey": true},
+        {"name": "ProductID", "dataType": "string"},
+        {"name": "ProductName", "dataType": "string"},
+        {"name": "Category", "dataType": "string"},
+        {"name": "SubCategory", "dataType": "string"},
+        {"name": "UnitCost", "dataType": "double", "formatString": "$#,##0.00"},
+        {"name": "UnitPrice", "dataType": "double", "formatString": "$#,##0.00"}
+      ],
+      "hierarchies": [
+        {
+          "name": "Product Hierarchy",
+          "levels": ["Category", "SubCategory", "ProductName"]
+        }
+      ]
+    },
+    {
+      "name": "DimStore",
+      "description": "Store geographic dimension covering nationwide retail footprint",
+      "columns": [
+        {"name": "StoreKey", "dataType": "int64", "isKey": true},
+        {"name": "StoreName", "dataType": "string"},
+        {"name": "City", "dataType": "string"},
+        {"name": "State", "dataType": "string"},
+        {"name": "Region", "dataType": "string"},
+        {"name": "StoreType", "dataType": "string"}
+      ],
+      "hierarchies": [
+        {
+          "name": "Geography Hierarchy",
+          "levels": ["Region", "State", "City", "StoreName"]
+        }
+      ]
+    },
+    {
+      "name": "DimSeason",
+      "description": "Master season reference dimension enabling seasonal segmentation and theme mapping",
+      "columns": [
+        {"name": "SeasonKey", "dataType": "int64", "isKey": true},
+        {"name": "SeasonName", "dataType": "string"},
+        {"name": "SeasonCode", "dataType": "string"},
+        {"name": "StartDate", "dataType": "dateTime", "formatString": "yyyy-mm-dd"},
+        {"name": "EndDate", "dataType": "dateTime", "formatString": "yyyy-mm-dd"},
+        {"name": "Description", "dataType": "string"}
+      ]
+    },
+    {
+      "name": "_Measures",
+      "description": "Dedicated measures table for enterprise DAX governance"
+    }
+  ],
+  "relationships": [
+    {
+      "name": "FK_FactSales_DimDate",
+      "fromTable": "FactSales",
+      "fromColumn": "DateKey",
+      "toTable": "DimDate",
+      "toColumn": "DateKey",
+      "cardinality": "ManyToOne",
+      "crossFilteringBehavior": "OneDirection",
+      "isActive": true
+    },
+    {
+      "name": "FK_FactSales_DimProduct",
+      "fromTable": "FactSales",
+      "fromColumn": "ProductKey",
+      "toTable": "DimProduct",
+      "toColumn": "ProductKey",
+      "cardinality": "ManyToOne",
+      "crossFilteringBehavior": "OneDirection",
+      "isActive": true
+    },
+    {
+      "name": "FK_FactSales_DimStore",
+      "fromTable": "FactSales",
+      "fromColumn": "StoreKey",
+      "toTable": "DimStore",
+      "toColumn": "StoreKey",
+      "cardinality": "ManyToOne",
+      "crossFilteringBehavior": "OneDirection",
+      "isActive": true
+    },
+    {
+      "name": "FK_FactSales_DimSeason",
+      "fromTable": "FactSales",
+      "fromColumn": "SeasonKey",
+      "toTable": "DimSeason",
+      "toColumn": "SeasonKey",
+      "cardinality": "ManyToOne",
+      "crossFilteringBehavior": "OneDirection",
+      "isActive": true
+    }
+  ]
+}
